@@ -1,20 +1,25 @@
+-- Initialise Hivemall functions and tables
 add jar /home/rohit_nair2/hivemall-all-0.6.0-incubating.jar;
 source /home/rohit_nair2/define-all.hive;
 
+-- Set variables
 SET hive.cli.print.header=true;
 
 SET hivevar:n_docs=10;
 
+-- Create macros
 CREATE TEMPORARY MACRO max2(x INT, y INT)
 if(x>y,x,y);
 
 CREATE TEMPORARY MACRO tfidf(tf FLOAT, df_t INT, n_docs INT)
 tf * (log(10, CAST(n_docs as FLOAT)/max2(1,df_t)) + 1.0);
 
+-- Create tables for 10 records
 CREATE TABLE postsDB.tfIdfTable_temp AS SELECT OwnerUserId, Body, Score FROM postsDB.posts ORDER BY Score DESC LIMIT 10;
 
 CREATE TABLE postsDB.tfIdfTable AS SELECT OwnerUserId, Body FROM postsDB.tfIdfTable_temp;
 
+-- Create views to calcualte TF-IDF
 CREATE OR REPLACE VIEW postsDB.explodedView AS SELECT OwnerUserId, word FROM postsDB.tfIdfTable LATERAL VIEW explode(split(Body, ' ')) t AS word WHERE NOT is_stopword(word);
 
 CREATE OR REPLACE VIEW postsDB.termFreq AS SELECT OwnerUserId, word, freq FROM (SELECT OwnerUserId, tf(word) AS word2freq FROM postsDB.explodedView GROUP BY OwnerUserId) t LATERAL VIEW explode(word2freq) t2 AS word, freq;
