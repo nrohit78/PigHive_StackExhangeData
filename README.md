@@ -1,6 +1,6 @@
 Task Details:
 
-1. Acquire the top 200,000 posts by viewcount 
+1. Acquire the top 200,000 posts by viewcount from stack exchange (https://data.stackexchange.com/stackoverflow/queries)
 2. Using Pig or MapReduce , extract, transform and load the data as applicable
 3. Using Hive and/or MapReduce , get:
   I.
